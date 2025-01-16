@@ -23,5 +23,5 @@ class PreProcess:
         self.download(bucket_name,s3_file_name,local_file_path)
 if __name__ == '__main__':
     PreProcess = PreProcess()
-    PreProcess.download("mlopsluis","dataset/chatbotSentiment.csv","dataset_empathetic/traindownload.csv")
+    PreProcess.download("mlopsluis","dataset/chatbotSentiment.csv","traindownload.csv")
     #PreProcess.upload("E:/Chatbot Sentiment Analysis/Chatbot-Sentiment-Analysis/dataset_empathetic/empatheticdialogues/train1.csv","dataset/chatbotSentiment.csv","mlopsluis")
