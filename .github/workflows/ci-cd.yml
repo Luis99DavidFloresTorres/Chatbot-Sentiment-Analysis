@@ -14,6 +14,6 @@ jobs:
         with:
           python-version: '3.9'
       - name: Install dependencies
-        uses: pip install -r requirements.txt
+        run: pip install -r requirements.txt
       - name: Preprocess steps
-        uses: python scripts/feed_back_model/pre-process.py
+        run: python scripts/feed_back_model/pre-process.py
