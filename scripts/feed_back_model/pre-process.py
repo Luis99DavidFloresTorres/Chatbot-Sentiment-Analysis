@@ -28,28 +28,32 @@ class PreProcess:
             txt_idx = df.loc[i, ['utterance_idx']].item()
 
             if txt_idx==1 and i!=0:
-                inp = inp+' /nbot:'
+                #inp = inp+' \nbot:'
                 sentiment = df.loc[i-1, ['context']].apply(self.clean_text).item()
                 text = df.loc[i-1, ['utterance']].apply(self.clean_text).item()
-                structure = {'input': inp, 'conversation': text, 'sentiment': self.convert_sentiment(sentiment)}
+                inp = inp + ' bot: ' + text
+               #structure = {'input': inp, 'conversation': text, 'sentiment': self.convert_sentiment(sentiment)}
+                structure = {'input':inp, 'sentiment': self.convert_sentiment(sentiment)}
                 dataset_preprocees.append(structure)
                 text = df.loc[i, ['utterance']].apply(self.clean_text).item()
-                inp =' human:' + text
+                inp =' human:' + text + ' \n'
             else:
                 text = df.loc[i, ['utterance']].apply(self.clean_text).item()
 
                 if i<len(df)-1 and df.loc[i+1, ['utterance_idx']].item()!=1:
                     if flagHuman:
-                        inp=inp+' human:'+text
+                        inp=inp+' human:'+text+' \n'
                         flagHuman = False
                     else:
-                        inp=inp+' bot:'+text
+                        inp=inp+' bot:'+text+ ' \n'
                         flagHuman = True
                 if i == len(df)-1:
-                    inp = inp + ' /nbot:'
+
                     sentiment = df.loc[i, ['context']].apply(self.clean_text).item()
                     text = df.loc[i , ['utterance']].apply(self.clean_text).item()
-                    structure ={'input': inp, 'conversation': text, 'sentiment': self.convert_sentiment(sentiment)}
+                    inp = inp + ' bot:' +text
+                    #structure ={'input': inp, 'conversation': text, 'sentiment': self.convert_sentiment(sentiment)}
+                    structure = {'input':inp, 'sentiment': self.convert_sentiment(sentiment)}
                     dataset_preprocees.append(structure)
         export = pd.DataFrame(dataset_preprocees)
         export.to_csv('../../dataset_empathetic/empatheticdialogues/train_dataset.csv', index=False)
