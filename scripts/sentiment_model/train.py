@@ -56,7 +56,7 @@ def main():
     # Entrenar modelo
     trainer.train()
     trainer.save_model(args.output_dir)
-
+    tokenizer.save_pretrained(args.output_dir)
 
 if __name__ == "__main__":
     main()
