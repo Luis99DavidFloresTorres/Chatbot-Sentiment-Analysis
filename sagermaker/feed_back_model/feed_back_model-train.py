@@ -2,13 +2,13 @@ from sagemaker.huggingface import HuggingFace
 from sagemaker import get_execution_role
 from sagemaker import TrainingInput
 from datetime import datetime
-
+import boto3
 if __name__ == "__main__":
-    # Definir el rol IAM y el bucket de S3
+
     role = "arn:aws:iam::288761759286:role/chatbotsentiment"
     bucket_name = "mlopsluis"
     file_cv_name = "dataset/train_dataset.csv"
-
+    s3 = boto3.client('s3')
     # Ruta S3 para los datos de entrenamiento
     s3_train_path = f"s3://{bucket_name}/{file_cv_name}"
     train_input = TrainingInput(s3_train_path, content_type="csv")
@@ -38,18 +38,18 @@ if __name__ == "__main__":
         },
     )
 
-    # Lanzar el trabajo de entrenamiento
+
     huggingface_estimator.fit({"train": train_input})
 
     last_training_job = huggingface_estimator.latest_training_job.name
 
-    # Definir las rutas en S3
+
     source_bucket = bucket_name
     source_key = f"outputChatbotModel/{last_training_job}/output/model.tar.gz"
     destination_key = "outputChatbotModel/latest-model.tar.gz"
 
     s3.copy_object(
         Bucket=source_bucket,
-        CopySource={"Bucket": source_bucket, "Key": source_key},
+        CopySource=source_key,
         Key=destination_key,
     )

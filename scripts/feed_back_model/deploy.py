@@ -23,7 +23,8 @@ huggingface_model = HuggingFaceModel(
 # Desplegar el modelo como Serverless
 predictor = huggingface_model.deploy(
     serverless_inference_config=serverless_config,
-    endpoint_name="serverless2-feed-back-endpoint"  # Nombre del endpoint
+    endpoint_name="serverless2-feed-back-endpoint",
+    update=True
 )
 
 print(f"Serverless Endpoint URL: {predictor.endpoint_name}")

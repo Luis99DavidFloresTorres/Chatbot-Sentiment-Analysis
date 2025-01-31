@@ -1,9 +1,10 @@
 from sagemaker.huggingface import HuggingFace
 from sagemaker import get_execution_role
 from sagemaker import TrainingInput
-
+import boto3
 if __name__ == '__main__':
     role = "arn:aws:iam::288761759286:role/chatbotsentiment"
+    s3 = boto3.client('s3')
     bucket_name = 'mlopsluis'
     file_cv_name =  "dataset/train_dataset.csv"
     s3_train_path = f"s3://{bucket_name}/{file_cv_name}"
@@ -37,6 +38,6 @@ if __name__ == '__main__':
 
     s3.copy_object(
         Bucket=source_bucket,
-        CopySource={"Bucket": source_bucket, "Key": source_key},
+        CopySource=source_key,
         Key=destination_key,
     )
