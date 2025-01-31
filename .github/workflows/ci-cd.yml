@@ -20,7 +20,7 @@ jobs:
           aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws sts get-caller-identity
       - name: Run requirements
-        run: python install -r requirements
+        run: python install -r requirements.txt
       - name: subir dataset
         run: python uploadDataset.py
       - name: Pre-procesamiento Datos
