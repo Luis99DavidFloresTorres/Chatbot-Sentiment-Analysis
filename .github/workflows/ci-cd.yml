@@ -24,7 +24,7 @@ jobs:
       - name: subir dataset
         run: python uploadDataset.py
       - name: Pre-procesamiento Datos
-        run: python scripts/feed_back_model/pre-process.py
+        run: python scripts/feed_back_model/preprocess.py
   train:
     runs-on: ubuntu-latest
     environment: production-train
