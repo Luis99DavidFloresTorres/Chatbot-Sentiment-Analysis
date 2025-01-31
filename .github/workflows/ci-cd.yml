@@ -48,3 +48,20 @@ jobs:
         run: python sagermaker/feed_back_model/feed_back_model-train.py
       - name: Train model sentiment analysis
         run: python sagermaker/sentiment_model-train/sentiment_model-train.py
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production-train
+    needs: train
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      - name: Install requirements
+        run: pip install -r requirements.txt
+      - name: Deploy Chatbot model
+        run: python scripts/feed_back_model/deploy.py
+      - name: Deploy Sentiment model
+        run: python scripts/sentiment_model/deploy.py
