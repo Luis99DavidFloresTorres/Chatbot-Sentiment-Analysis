@@ -45,7 +45,7 @@ if __name__ == "__main__":
 
 
     source_bucket = bucket_name
-    source_key = f"outputChatbotModel/{last_training_job}/output/model.tar.gz"
+    sCopySource={'Bucket': 'mlopsluis', 'Key': f"outputChatbotModel/{last_training_job}/output/model.tar.gz"},
     destination_key = "outputChatbotModel/latest-model.tar.gz"
 
     s3.copy_object(
