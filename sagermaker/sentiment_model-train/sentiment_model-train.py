@@ -33,7 +33,7 @@ if __name__ == '__main__':
 
     last_training_job = huggingface_estimator.latest_training_job.name
     source_bucket = bucket_name
-    source_key = f"outputSentimentModel/{last_training_job}/output/model.tar.gz"
+    CopySource={'Bucket': 'mlopsluis', 'Key': f"outputSentimentModel/{last_training_job}/output/model.tar.gz"},
     destination_key = "outputSentimentModel/latest-model.tar.gz"
 
     s3.copy_object(
