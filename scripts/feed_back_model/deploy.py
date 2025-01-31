@@ -3,7 +3,7 @@ import boto3
 from sagemaker.huggingface import HuggingFaceModel
 #role = get_execution_role()
 role = "arn:aws:iam::288761759286:role/chatbotsentiment"
-model_data = "s3://mlopsluis/outputChatbotModel/huggingface-pytorch-training-2025-01-21-05-53-33-915/output/model.tar.gz"
+model_data = "s3://mlopsluis/outputChatbotModel/latest-model.tar.gz"
 # Configuración serverless
 serverless_config = ServerlessInferenceConfig(
     memory_size_in_mb=3072 ,  # Memoria provisionada

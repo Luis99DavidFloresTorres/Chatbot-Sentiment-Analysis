@@ -13,3 +13,31 @@ jobs:
           aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws sts get-caller-identity
+      - name: Run requirements
+        run: python install -r requirements
+      - name: subir dataset
+        run: python uploadDataset.py
+      - name: Pre-procesamiento Datos
+        run: python scripts/feed_back_model/pre-process.py
+  train:
+    runs-on: ubuntu-latest
+    environment: production-train
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      - name: AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{secrets.AWS_ACCESS_KEY_ID}}
+          aws-secret-access-key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+          aws-region: us-east-2
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Train model chatbot
+        run: python sagermaker/feed_back_model/feed_back_model-train.py
+      - name: Train model sentiment analysis
+        run: python sagermaker/sentiment_model-train/sentiment_model-train.py
