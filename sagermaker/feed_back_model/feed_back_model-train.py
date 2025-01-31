@@ -40,3 +40,16 @@ if __name__ == "__main__":
 
     # Lanzar el trabajo de entrenamiento
     huggingface_estimator.fit({"train": train_input})
+
+    last_training_job = huggingface_estimator.latest_training_job.name
+
+    # Definir las rutas en S3
+    source_bucket = bucket_name
+    source_key = f"outputChatbotModel/{last_training_job}/output/model.tar.gz"
+    destination_key = "outputChatbotModel/latest-model.tar.gz"
+
+    s3.copy_object(
+        Bucket=source_bucket,
+        CopySource={"Bucket": source_bucket, "Key": source_key},
+        Key=destination_key,
+    )

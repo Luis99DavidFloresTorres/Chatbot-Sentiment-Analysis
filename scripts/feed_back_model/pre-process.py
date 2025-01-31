@@ -1,8 +1,6 @@
 import pandas as pd
 import boto3
 class PreProcess:
-    def __init__(self):
-        print("funciona")
     def upload(self, local_file_path, s3_filename, bucket_name):
 
         s3 = boto3.client('s3')
@@ -56,7 +54,7 @@ class PreProcess:
                     structure = {'input':inp, 'sentiment': self.convert_sentiment(sentiment)}
                     dataset_preprocees.append(structure)
         export = pd.DataFrame(dataset_preprocees)
-        export.to_csv('../../dataset_empathetic/empatheticdialogues/train_dataset.csv', index=False)
+        export.to_csv('./train_dataset.csv', index=False)
         self.upload(local_file_path,s3_file_name,bucket_name)
     def clean_text(self, text):
         return str(text).replace("_comma_", ",").strip()
@@ -78,7 +76,7 @@ class PreProcess:
         return jsn[sentiment]
 if __name__ == '__main__':
     PreProcess = PreProcess()
-    PreProcess.processText('mlopsluis',"dataset/train_dataset.csv",'E:/Chatbot Sentiment Analysis/Chatbot-Sentiment-Analysis/dataset_empathetic/empatheticdialogues/train_dataset.csv')
+    PreProcess.processText('mlopsluis',"dataset/train_dataset.csv",'train_dataset.csv')
     #print("people_comma_".replace("_comma_",","))
     #PreProcess.download("mlopsluis","dataset/chatbotSentiment.csv","traindownload.csv")
     #PreProcess.upload("E:/Chatbot Sentiment Analysis/Chatbot-Sentiment-Analysis/dataset_empathetic/empatheticdialogues/train1.csv","dataset/chatbotSentiment.csv","mlopsluis")
