@@ -17,7 +17,7 @@ class PreProcess:
         except Exception as e:
             print(f"Error to download the file: {e}")
     def processText(self, bucket_name,s3_file_name,local_file_path):
-        df = pd.read_csv('../../dataset_empathetic/empatheticdialogues/traindownload.csv', on_bad_lines='skip')
+        df = pd.read_csv(local_file_path, on_bad_lines='skip')
         dataset_preprocees = []
         inp=""
         flagHuman = True
