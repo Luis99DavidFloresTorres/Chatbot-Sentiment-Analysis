@@ -28,6 +28,7 @@ jobs:
   train:
     runs-on: ubuntu-latest
     environment: production-train
+    needs: preprocess
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
