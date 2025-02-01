@@ -19,7 +19,12 @@ huggingface_model = HuggingFaceModel(
     model_data=model_data,
     role=role
 )
-
+try:
+    sagemaker_client.describe_endpoint_config(EndpointConfigName='serverless2-sentiment-endpoint')
+    print(f"Eliminando configuración de endpoint existente: serverless2-sentiment-endpoint")
+    sagemaker_client.delete_endpoint_config(EndpointConfigName='serverless2-sentiment-endpoint')
+except sagemaker_client.exceptions.ClientError:
+    print(f"La configuración de endpoint serverless2-sentiment-endpoint no existe. Se creará una nueva.")
 # Desplegar el modelo como Serverless
 predictor = huggingface_model.deploy(
     serverless_inference_config=serverless_config,
