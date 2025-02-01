@@ -9,10 +9,17 @@ sagemaker_client = boto3.client("sagemaker")
 
 # 🔴 1️⃣ Verificar si el endpoint ya existe y eliminarlo
 try:
-    sagemaker_client.describe_endpoint(EndpointName=endpoint_name)
+    sagemaker_client.describe_endpoint_config(
+        EndpointConfigName=endpoint_name
+    )
+
     print(f"⚠️ Endpoint {endpoint_name} ya existe. Eliminándolo...")
     sagemaker_client.delete_endpoint(EndpointName=endpoint_name)
+    sagemaker_client.delete_endpoint_config(
+        EndpointConfigName=endpoint_name
+    )
 
+    # Esperar hasta que el endpoint se elimine
     waiter = sagemaker_client.get_waiter('endpoint_deleted')
     waiter.wait(EndpointName=endpoint_name)
     print("✅ Endpoint eliminado correctamente.")
