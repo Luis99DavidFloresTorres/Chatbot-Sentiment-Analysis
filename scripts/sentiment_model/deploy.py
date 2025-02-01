@@ -9,7 +9,7 @@ serverless_config = ServerlessInferenceConfig(
     memory_size_in_mb=3072 ,  # Memoria provisionada
     max_concurrency=1       # Máximo de solicitudes concurrentes
 )
-
+sagemaker_client = boto3.client('sagemaker')
 # Crear el modelo
 huggingface_model = HuggingFaceModel(
     transformers_version="4.26",
