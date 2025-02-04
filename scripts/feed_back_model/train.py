@@ -42,14 +42,15 @@ def main():
     s3_bucket = "mlopsluis"
     s3_key = 'outputChatbotModel/'
     s3 = boto3.client("s3")
-    local_model_dir = "/tmp/modelo"
-    s3.download_file(s3_bucket, f"{s3_key}latest-model.tar.gz", f"{local_model_dir}/latest-model.tar.gz")
-    with tarfile.open(local_model_dir+'/latest-model.tar.gz', "r:gz") as tar:
+    local_model_dir = "/opt/ml/input/data/"
+    extract_path = "/opt/ml/input/data/"
+    s3.download_file(s3_bucket, f"{s3_key}latest-model.tar.gz", f"{local_model_dir}latest-model.tar.gz")
+    with tarfile.open(local_model_dir+'latest-model.tar.gz', "r:gz") as tar:
         tar.extractall(extract_path)
     tokenized_datasets = dataset.map(preprocess_function, batched=True, remove_columns=dataset["train"].column_names)
 
     # Modelo
-    model = AutoModelForCausalLM.from_pretrained("/tmp/modelo/latest-model")
+    model = AutoModelForCausalLM.from_pretrained("/opt/ml/input/data/latest-model")
     model.resize_token_embeddings(len(tokenizer))
     model.to(device)
 

@@ -37,9 +37,10 @@ def main():
     s3_bucket = "mlopsluis"
     s3_key='outputSentimentModel/'
     s3 = boto3.client("s3")
-    local_model_dir = "/tmp/modelo"
-    s3.download_file(s3_bucket, f"{s3_key}latest-model.tar.gz", f"{local_model_dir}/latest-model.tar.gz")
-    with tarfile.open(f"{local_model_dir}/latest-model.tar.gz", "r:gz") as tar:
+    local_model_dir = "/opt/ml/input/data/"
+    extract_path = "/opt/ml/input/data/"
+    s3.download_file(s3_bucket, f"{s3_key}latest-model.tar.gz", f"{local_model_dir}latest-model.tar.gz")
+    with tarfile.open(f"{local_model_dir}latest-model.tar.gz", "r:gz") as tar:
         tar.extractall(extract_path)
 
     # Cargar datos
@@ -55,7 +56,7 @@ def main():
     tokenized_datasets = dataset.map(preprocess_function, batched=True)
 
     # Modelo
-    model = AutoModelForSequenceClassification.from_pretrained("/tmp/model/latest-model", num_labels=32)
+    model = AutoModelForSequenceClassification.from_pretrained("/opt/ml/input/data/latest-model", num_labels=32)
     model.to(device)
     # Configuración de entrenamiento
     training_args = TrainingArguments(
