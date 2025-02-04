@@ -38,10 +38,10 @@ def main():
     s3_key='outputSentimentModel/'
     s3 = boto3.client("s3")
     local_model_dir = "/tmp/modelo"
-
-    with tarfile.open(download_path, "r:gz") as tar:
-        tar.extractall(extract_path)
     s3.download_file(s3_bucket, f"{s3_key}latest-model.tar.gz", f"{local_model_dir}/latest-model.tar.gz")
+    with tarfile.open(f"{local_model_dir}/latest-model.tar.gz", "r:gz") as tar:
+        tar.extractall(extract_path)
+
     # Cargar datos
     dataset = load_dataset("csv", data_files={"train": "/opt/ml/input/data/train/train_dataset.csv"})
     tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")

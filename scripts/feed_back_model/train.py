@@ -43,11 +43,9 @@ def main():
     s3_key = 'outputChatbotModel/'
     s3 = boto3.client("s3")
     local_model_dir = "/tmp/modelo"
-
-    with tarfile.open(download_path, "r:gz") as tar:
-        tar.extractall(extract_path)
     s3.download_file(s3_bucket, f"{s3_key}latest-model.tar.gz", f"{local_model_dir}/latest-model.tar.gz")
-
+    with tarfile.open(local_model_dir+'/latest-model.tar.gz', "r:gz") as tar:
+        tar.extractall(extract_path)
     tokenized_datasets = dataset.map(preprocess_function, batched=True, remove_columns=dataset["train"].column_names)
 
     # Modelo
