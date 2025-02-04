@@ -4,7 +4,7 @@ from transformers import AutoTokenizer, AutoModelForCausalLM, Trainer, TrainingA
 from datasets import load_dataset
 import torch
 import os
-
+import boto3
 logging.basicConfig(level=logging.INFO)
 
 os.environ["CUDA_LAUNCH_BLOCKING"] = "1"
