@@ -33,7 +33,6 @@ if __name__ == "__main__":
         hyperparameters={
             "epochs": 1,  # Ajusta según sea necesario
             "batch_size": 1,  # Ajusta según sea necesario
-            "model_name": "gpt2",  # Modelo base para chatbot
             "output_dir": "/opt/ml/model"  # Carpeta de salida dentro de la instancia
         },
     )

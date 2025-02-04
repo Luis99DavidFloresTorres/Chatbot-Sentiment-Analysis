@@ -24,6 +24,7 @@ def main():
     dataset = load_dataset("csv", data_files={"train": "/opt/ml/input/data/train/train_dataset.csv"})
 
     tokenizer = AutoTokenizer.from_pretrained(args.model_name)
+    tokenizer.eos_token = "<|endoftext|>"
     tokenizer.pad_token = tokenizer.eos_token  # Asegurar que haya un token de relleno
 
     def preprocess_function(examples):
@@ -37,10 +38,19 @@ def main():
 
         return tokenized_inputs
 
+    s3_bucket = "mlopsluis"
+    s3_key = 'outputChatbotModel/'
+    s3 = boto3.client("s3")
+    local_model_dir = "/tmp/modelo"
+
+    with tarfile.open(download_path, "r:gz") as tar:
+        tar.extractall(extract_path)
+    s3.download_file(s3_bucket, f"{s3_key}latest-model.tar.gz", f"{local_model_dir}/latest-model.tar.gz")
+
     tokenized_datasets = dataset.map(preprocess_function, batched=True, remove_columns=dataset["train"].column_names)
 
     # Modelo
-    model = AutoModelForCausalLM.from_pretrained(args.model_name)
+    model = AutoModelForCausalLM.from_pretrained("/tmp/modelo/latest-model")
     model.resize_token_embeddings(len(tokenizer))
     model.to(device)
 

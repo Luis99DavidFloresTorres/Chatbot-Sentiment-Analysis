@@ -1,11 +1,13 @@
 from langchain.prompts import ChatPromptTemplate
-from langchain.chains import LLMChain, SimpleSequentialChain
+from langchain.chains import SimpleSequentialChain
 from langchain.memory import ConversationBufferMemory
 from langchain_community.llms import SagemakerEndpoint
 from langchain_community.llms.sagemaker_endpoint import LLMContentHandler
 import boto3
 import json
-
+from fastapi import FastAPI, Body, Request
+from pydantic import BaseModel
+import uvicorn
 # Configuración del cliente SageMaker
 sagemaker_runtime = boto3.client("sagemaker-runtime")
 
@@ -20,11 +22,7 @@ class CustomContentHandler(LLMContentHandler):
 
     def transform_output(self, output):
         try:
-            print('-------------------------------')
             response = json.loads(output.decode("utf-8"))
-            print("entraaaaaaaa")
-            print(response)
-            print(output)
             if isinstance(response, list) and "label" in response[0]:
                 return response[0]["label"]  # Retorna solo la etiqueta relevante
             elif isinstance(response, dict):
@@ -84,14 +82,14 @@ sentiment_prompt = ChatPromptTemplate.from_template("{input}")
 chatbot_prompt = ChatPromptTemplate.from_template("human: {input}\nbot:")
 
 # Crear chains
-sentiment_chain = LLMChain(llm=sentiment_model, prompt=sentiment_prompt)
-chatbot_chain = LLMChain(llm=chatbot_model, prompt=chatbot_prompt)
+sentiment_chain = sentiment_prompt | sentiment_model
+chatbot_chain = chatbot_prompt | chatbot_model
 
 # Encadenar tareas
 #combined_chain = SimpleSequentialChain(chains=[sentiment_chain, chatbot_chain])
 
 # Probar el flujo completo
-user_input = "I love using AWS SageMaker! It's amazing."
+user_input = "I lost my dog a few days ago \<bot>  "
 #response = combined_chain.run(user_input)
 #print("Respuesta final:", response)
 
@@ -107,7 +105,21 @@ def process_input(user_input):
     print(f"Sentimiento detectado: {sentiment_result}")
     print(f"Respuesta del chatbot: {chatbot_result}")
     return sentiment_result, chatbot_result
-
-
-# Probar el flujo completo
 sentiment, chatbot_response = process_input(user_input)
+print(sentiment)
+print(chatbot_response)
+'''
+app = FastAPI()
+class InputData(BaseModel):
+    input: str  # FastAPI espera este campo en el JSON
+@app.post("/predict/")
+def predict(input_text: InputData):
+    print('hola')
+    # Probar el flujo completo
+    print(input_text)
+    sentiment, chatbot_response = process_input(input_text.input)
+    return {"sentiment": sentiment, "chatbot_response": chatbot_response}
+if __name__ == '__main__':
+
+    uvicorn.run(app, host="0.0.0.0", port=8000)
+'''
