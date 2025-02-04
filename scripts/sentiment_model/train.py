@@ -4,11 +4,25 @@ from transformers import AutoModelForSequenceClassification, AutoTokenizer, Trai
 from datasets import load_dataset, Dataset
 import torch
 from datasets import load_dataset
-
-logging.basicConfig(level=logging.INFO)
+import boto3
+import tarfile
 import os
+from datasets import load_metric
+import numpy as np
 
+accuracy = load_metric("accuracy")
+f1 = load_metric("f1")
 os.environ["CUDA_LAUNCH_BLOCKING"] = "1"
+logging.basicConfig(level=logging.INFO)
+
+def compute_metrics(eval_pred):
+    logits, labels = eval_pred
+    predictions = np.argmax(logits, axis=-1)  # Convertir logits a clases predichas
+
+    return {
+        "accuracy": accuracy.compute(predictions=predictions, references=labels)["accuracy"],
+        "f1": f1.compute(predictions=predictions, references=labels, average="weighted")["f1"],
+    }
 
 
 def main():
@@ -21,20 +35,28 @@ def main():
     # parser.add_argument("--train_data", type=str)
     parser.add_argument("--output_dir", type=str)
     args = parser.parse_args()
+    s3_bucket = "mlopsluis"
+    s3_key='outputSentimentModel/'
+    s3 = boto3.client("s3")
+    local_model_dir = "/tmp/modelo"
 
+    with tarfile.open(download_path, "r:gz") as tar:
+        tar.extractall(extract_path)
+    s3.download_file(s3_bucket, f"{s3_key}latest-model.tar.gz", f"{local_model_dir}/latest-model.tar.gz")
     # Cargar datos
     dataset = load_dataset("csv", data_files={"train": "/opt/ml/input/data/train/train_dataset.csv"})
     tokenizer = AutoTokenizer.from_pretrained(args.model_name)
+    tokenizer.sep_token = "[SEP]"
     def preprocess_function(examples):
         # Tokenizamos el input y añadimos las etiquetas
         tokenized_inputs = tokenizer(examples["input"], truncation=True, padding="max_length")
-        tokenized_inputs["labels"] = examples["sentiment"]
+        tokenized_inputs["labels"] = int(examples["sentiment"])
         return tokenized_inputs
 
     tokenized_datasets = dataset.map(preprocess_function, batched=True)
 
     # Modelo
-    model = AutoModelForSequenceClassification.from_pretrained(args.model_name, num_labels=32)
+    model = AutoModelForSequenceClassification.from_pretrained("/tmp/model/latest-model", num_labels=32)
     model.to(device)
     # Configuración de entrenamiento
     training_args = TrainingArguments(
@@ -50,7 +72,8 @@ def main():
     trainer = Trainer(
         model=model,
         args=training_args,
-        train_dataset=tokenized_datasets["train"]
+        train_dataset=tokenized_datasets["train"],
+        compute_metrics=compute_metrics
     )
 
     # Entrenar modelo

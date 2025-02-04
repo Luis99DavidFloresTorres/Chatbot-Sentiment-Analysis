@@ -24,7 +24,6 @@ if __name__ == '__main__':
         hyperparameters={
             "epochs": 1,
             "batch_size": 1,
-            "model_name": "distilbert-base-uncased",
             "output_dir": "/opt/ml/model"
         }
     )
