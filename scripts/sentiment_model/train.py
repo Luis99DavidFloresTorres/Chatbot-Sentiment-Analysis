@@ -31,7 +31,6 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--epochs", type=int, default=3)
     parser.add_argument("--batch_size", type=int, default=16)
-    parser.add_argument("--model_name", type=str, default="distilbert-base-uncased")
     # parser.add_argument("--train_data", type=str)
     parser.add_argument("--output_dir", type=str)
     args = parser.parse_args()
@@ -45,7 +44,7 @@ def main():
     s3.download_file(s3_bucket, f"{s3_key}latest-model.tar.gz", f"{local_model_dir}/latest-model.tar.gz")
     # Cargar datos
     dataset = load_dataset("csv", data_files={"train": "/opt/ml/input/data/train/train_dataset.csv"})
-    tokenizer = AutoTokenizer.from_pretrained(args.model_name)
+    tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
     tokenizer.sep_token = "[SEP]"
     def preprocess_function(examples):
         # Tokenizamos el input y añadimos las etiquetas

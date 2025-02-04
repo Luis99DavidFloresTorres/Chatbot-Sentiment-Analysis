@@ -5,6 +5,8 @@ from datasets import load_dataset
 import torch
 import os
 import boto3
+import tarfile
+
 logging.basicConfig(level=logging.INFO)
 
 os.environ["CUDA_LAUNCH_BLOCKING"] = "1"
@@ -16,14 +18,13 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--epochs", type=int, default=3)
     parser.add_argument("--batch_size", type=int, default=8)
-    parser.add_argument("--model_name", type=str, default="gpt2-medium")
     parser.add_argument("--output_dir", type=str)
     args = parser.parse_args()
 
     # Cargar datos
     dataset = load_dataset("csv", data_files={"train": "/opt/ml/input/data/train/train_dataset.csv"})
 
-    tokenizer = AutoTokenizer.from_pretrained(args.model_name)
+    tokenizer = AutoTokenizer.from_pretrained("gpt2")
     tokenizer.eos_token = "<|endoftext|>"
     tokenizer.pad_token = tokenizer.eos_token  # Asegurar que haya un token de relleno
 
