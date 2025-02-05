@@ -15,14 +15,6 @@ f1 = load_metric("f1")
 os.environ["CUDA_LAUNCH_BLOCKING"] = "1"
 logging.basicConfig(level=logging.INFO)
 
-def compute_metrics(eval_pred):
-    logits, labels = eval_pred
-    predictions = np.argmax(logits, axis=-1)  # Convertir logits a clases predichas
-
-    return {
-        "accuracy": accuracy.compute(predictions=predictions, references=labels)["accuracy"],
-        "f1": f1.compute(predictions=predictions, references=labels, average="weighted")["f1"],
-    }
 
 
 def main():
@@ -43,14 +35,13 @@ def main():
     with tarfile.open(f"{local_model_dir}latest-model.tar.gz", "r:gz") as tar:
         tar.extractall(extract_path)
 
-    # Cargar datos
     dataset = load_dataset("csv", data_files={"train": "/opt/ml/input/data/train/train_dataset.csv"})
     tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
     tokenizer.sep_token = "[SEP]"
     def preprocess_function(examples):
         # Tokenizamos el input y añadimos las etiquetas
         tokenized_inputs = tokenizer(examples["input"], truncation=True, padding="max_length")
-        tokenized_inputs["labels"] = int(examples["sentiment"])
+        tokenized_inputs["labels"] = examples["sentiment"]
         return tokenized_inputs
 
     tokenized_datasets = dataset.map(preprocess_function, batched=True)
@@ -73,7 +64,6 @@ def main():
         model=model,
         args=training_args,
         train_dataset=tokenized_datasets["train"],
-        compute_metrics=compute_metrics
     )
 
     # Entrenar modelo
