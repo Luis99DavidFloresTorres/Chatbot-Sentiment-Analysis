@@ -37,7 +37,6 @@ def main():
 
     dataset = load_dataset("csv", data_files={"train": "/opt/ml/input/data/train/train_dataset.csv"})
     tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
-    tokenizer.sep_token = "[SEP]"
     def preprocess_function(examples):
         # Tokenizamos el input y añadimos las etiquetas
         tokenized_inputs = tokenizer(examples["input"], truncation=True, padding="max_length")
