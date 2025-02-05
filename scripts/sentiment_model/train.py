@@ -38,7 +38,7 @@ def main():
     s3_key='outputSentimentModel/'
     s3 = boto3.client("s3")
     local_model_dir = "/opt/ml/input/data/"
-    extract_path = "/opt/ml/input/data/"
+    extract_path = "/opt/ml/input/data/latest-model/"
     s3.download_file(s3_bucket, f"{s3_key}latest-model.tar.gz", f"{local_model_dir}latest-model.tar.gz")
     with tarfile.open(f"{local_model_dir}latest-model.tar.gz", "r:gz") as tar:
         tar.extractall(extract_path)
