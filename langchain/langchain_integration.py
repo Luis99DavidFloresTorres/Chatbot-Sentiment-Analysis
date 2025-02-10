@@ -7,6 +7,7 @@ import boto3
 import json
 from fastapi import FastAPI, Body, Request
 from pydantic import BaseModel
+from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 # Configuración del cliente SageMaker
 sagemaker_runtime = boto3.client("sagemaker-runtime")
@@ -79,7 +80,7 @@ chatbot_model = SageMakerLLM(endpoint_name="serverless2-feed-back-endpoint")
 
 # Crear prompts
 sentiment_prompt = ChatPromptTemplate.from_template("{input}")
-chatbot_prompt = ChatPromptTemplate.from_template("human: {input}\nbot:")
+chatbot_prompt = ChatPromptTemplate.from_template("{input}\nbot:")
 
 # Crear chains
 sentiment_chain = sentiment_prompt | sentiment_model
@@ -105,11 +106,18 @@ def process_input(user_input):
     print(f"Sentimiento detectado: {sentiment_result}")
     print(f"Respuesta del chatbot: {chatbot_result}")
     return sentiment_result, chatbot_result
-sentiment, chatbot_response = process_input(user_input)
-print(sentiment)
-print(chatbot_response)
-'''
+#sentiment, chatbot_response = process_input(user_input)
+#print(sentiment)
+#print(chatbot_response)
+
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Permite todos los orígenes
+    allow_credentials=True,
+    allow_methods=["*"],  # Permite todos los métodos (GET, POST, etc.)
+    allow_headers=["*"],  # Permite todos los encabezados
+)
 class InputData(BaseModel):
     input: str  # FastAPI espera este campo en el JSON
 @app.post("/predict/")
@@ -122,4 +130,3 @@ def predict(input_text: InputData):
 if __name__ == '__main__':
 
     uvicorn.run(app, host="0.0.0.0", port=8000)
-'''
